@@ -39,7 +39,7 @@ deploy:
   api_key: ${GITHUB_KEY}
   skip_cleanup: true
   file_glob: true
-  file: "build/distributions/lombok-plugin-*.zip"
+  file: "build/distributions/bali-plugin-*.zip"
   on:
     tags: true
     condition: $TRAVIS_TAG =~ ^releasebuild_[0-9]+.*$

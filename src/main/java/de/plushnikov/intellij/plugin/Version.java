@@ -9,11 +9,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public interface Version {
-  @NonNls String PLUGIN_NAME = "Lombok plugin";
+  @NonNls String PLUGIN_NAME = "Bali plugin";
   /**
    * Current plugin version.
    */
-  @NonNls String PLUGIN_VERSION = "0.35";
+  @NonNls String PLUGIN_VERSION = "0.35.1";
   /**
    * Current version of lombok plugin
    */

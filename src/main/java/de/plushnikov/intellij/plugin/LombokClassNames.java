@@ -56,6 +56,9 @@ public interface LombokClassNames {
   @NonNls String WITHER = "lombok.experimental.Wither";
   @NonNls String XSLF_4_J = "lombok.extern.slf4j.XSlf4j";
 
+  @NonNls String BY_ID = "ru.coolsoft.annotations.ById";
+  @NonNls String BY_ID_REF_FIELD = "ru.coolsoft.annotations.ByIdRefField";
+
   List<String> MAIN_LOMBOK_CLASSES = ContainerUtil.immutableList(ALL_ARGS_CONSTRUCTOR, REQUIRED_ARGS_CONSTRUCTOR, NO_ARGS_CONSTRUCTOR,
                                                                  DATA, GETTER, SETTER, EQUALS_AND_HASHCODE, TO_STRING,
                                                                  LOG_4_J, LOG_4_J_2, SLF_4_J, JAVA_LOG, JBOSS_LOG, FLOGGER, COMMONS_LOG,

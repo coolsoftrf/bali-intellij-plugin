@@ -67,6 +67,9 @@ Features / Supports
 - refactoring actions (lombok and delombok)
 - project configuration inspection (missing/out-of-date Lombok dependency, annotation processing disabled)
 
+This Lombok plugin evolution also supports additional annotations such as
+- @ById with verification against @ByIdRefField presence
+
 Many features of the plugin (including warnings) could be disabled through per-project settings.
 
 Installation

@@ -10,4 +10,4 @@ pluginManagement {
   }
 }
 
-rootProject.name = 'lombok-plugin'
+rootProject.name = 'bali-plugin'

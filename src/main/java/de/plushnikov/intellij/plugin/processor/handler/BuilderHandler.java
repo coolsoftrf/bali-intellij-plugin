@@ -1,10 +1,43 @@
 package de.plushnikov.intellij.plugin.processor.handler;
 
+import static com.intellij.openapi.util.text.StringUtil.capitalize;
+import static com.intellij.openapi.util.text.StringUtil.replace;
+import static de.plushnikov.intellij.plugin.lombokconfig.ConfigKey.BUILDER_CLASS_NAME;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiElementFactory;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.PsiNameHelper;
+import com.intellij.psi.PsiParameter;
+import com.intellij.psi.PsiReferenceList;
+import com.intellij.psi.PsiSubstitutor;
+import com.intellij.psi.PsiType;
+import com.intellij.psi.PsiTypeParameter;
+import com.intellij.psi.PsiTypeParameterListOwner;
 import com.intellij.psi.impl.source.PsiClassReferenceType;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import de.plushnikov.intellij.plugin.LombokBundle;
 import de.plushnikov.intellij.plugin.LombokClassNames;
 import de.plushnikov.intellij.plugin.lombokconfig.ConfigDiscovery;
@@ -15,18 +48,11 @@ import de.plushnikov.intellij.plugin.processor.handler.singular.AbstractSingular
 import de.plushnikov.intellij.plugin.processor.handler.singular.SingularHandlerFactory;
 import de.plushnikov.intellij.plugin.psi.LombokLightClassBuilder;
 import de.plushnikov.intellij.plugin.psi.LombokLightMethodBuilder;
-import de.plushnikov.intellij.plugin.util.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import static com.intellij.openapi.util.text.StringUtil.capitalize;
-import static com.intellij.openapi.util.text.StringUtil.replace;
-import static de.plushnikov.intellij.plugin.lombokconfig.ConfigKey.BUILDER_CLASS_NAME;
+import de.plushnikov.intellij.plugin.util.LombokProcessorUtil;
+import de.plushnikov.intellij.plugin.util.PsiAnnotationSearchUtil;
+import de.plushnikov.intellij.plugin.util.PsiAnnotationUtil;
+import de.plushnikov.intellij.plugin.util.PsiClassUtil;
+import de.plushnikov.intellij.plugin.util.PsiMethodUtil;
 
 /**
  * Handler methods for Builder-processing
@@ -45,18 +71,20 @@ public class BuilderHandler {
   public static final String TO_BUILDER_METHOD_NAME = "toBuilder";
   static final String TO_BUILDER_ANNOTATION_KEY = "toBuilder";
 
-  private static final Collection<String> INVALID_ON_BUILDERS = Stream.of(LombokClassNames.GETTER,
-                                                                          LombokClassNames.SETTER,
-                                                                          LombokClassNames.WITHER,
-                                                                          LombokClassNames.WITH,
-                                                                          LombokClassNames.TO_STRING,
-                                                                          LombokClassNames.EQUALS_AND_HASHCODE,
-                                                                          LombokClassNames.REQUIRED_ARGS_CONSTRUCTOR,
-                                                                          LombokClassNames.ALL_ARGS_CONSTRUCTOR,
-                                                                          LombokClassNames.NO_ARGS_CONSTRUCTOR,
-                                                                          LombokClassNames.DATA,
-                                                                          LombokClassNames.VALUE,
-                                                                          LombokClassNames.FIELD_DEFAULTS).map(fqn -> StringUtil.getShortName(fqn)).collect(Collectors.toUnmodifiableSet());
+  private static final Collection<String> INVALID_ON_BUILDERS = Stream.of(
+    LombokClassNames.GETTER,
+    LombokClassNames.SETTER,
+    LombokClassNames.WITHER,
+    LombokClassNames.WITH,
+    LombokClassNames.TO_STRING,
+    LombokClassNames.EQUALS_AND_HASHCODE,
+    LombokClassNames.REQUIRED_ARGS_CONSTRUCTOR,
+    LombokClassNames.ALL_ARGS_CONSTRUCTOR,
+    LombokClassNames.NO_ARGS_CONSTRUCTOR,
+    LombokClassNames.DATA,
+    LombokClassNames.VALUE,
+    LombokClassNames.FIELD_DEFAULTS
+  ).map(StringUtil::getShortName).collect(Collectors.toUnmodifiableSet());
 
   PsiSubstitutor getBuilderSubstitutor(@NotNull PsiTypeParameterListOwner classOrMethodToBuild, @NotNull PsiClass innerClass) {
     PsiSubstitutor substitutor = PsiSubstitutor.EMPTY;
@@ -98,17 +126,15 @@ public class BuilderHandler {
     final Optional<BuilderInfo> anyBuilderDefaultAndSingulars = builderInfos.stream()
       .filter(BuilderInfo::hasBuilderDefaultAnnotation)
       .filter(BuilderInfo::hasSingularAnnotation).findAny();
-    anyBuilderDefaultAndSingulars.ifPresent(builderInfo -> {
-        problemBuilder.addError(LombokBundle.message("inspection.message.builder.default.singular.cannot.be.mixed"));
-      }
+    anyBuilderDefaultAndSingulars.ifPresent(builderInfo ->
+      problemBuilder.addError(LombokBundle.message("inspection.message.builder.default.singular.cannot.be.mixed"))
     );
 
     final Optional<BuilderInfo> anyBuilderDefaultWithoutInitializer = builderInfos.stream()
       .filter(BuilderInfo::hasBuilderDefaultAnnotation)
       .filter(BuilderInfo::hasNoInitializer).findAny();
-    anyBuilderDefaultWithoutInitializer.ifPresent(builderInfo -> {
-        problemBuilder.addError(LombokBundle.message("inspection.message.builder.default.requires.initializing.expression"));
-      }
+    anyBuilderDefaultWithoutInitializer.ifPresent(builderInfo ->
+        problemBuilder.addError(LombokBundle.message("inspection.message.builder.default.requires.initializing.expression"))
     );
 
     return anyBuilderDefaultAndSingulars.isEmpty() || anyBuilderDefaultWithoutInitializer.isEmpty();
