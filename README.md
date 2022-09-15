@@ -1,4 +1,4 @@
-lombok-intellij-plugin [![Donate](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3F9HXD7A2SMCN)
+bali-intellij-plugin [![Donate](https://www.paypal.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=3F9HXD7A2SMCN)
 ======================
 [![Build Status][badge-travis-img]][badge-travis] [![Code Coverage](https://img.shields.io/codecov/c/github/mplushnikov/lombok-intellij-plugin/master.svg)](https://codecov.io/github/mplushnikov/lombok-intellij-plugin?branch=master)
 
@@ -13,7 +13,7 @@ lombok-intellij-plugin [![Donate](https://www.paypal.com/en_US/i/btn/btn_donateC
 
 Provides support for lombok annotations to write great Java code with IntelliJ IDEA.
 
-**Last version (0.34) released on 17.01.2021**
+**Last version (0.35.2) released on 08.08.2022**
 
 ---
 :collision: **Breaking News: Starting with IntelliJ version 2020.3 lombok plugin will be integrated and included in IntelliJ by default!.** :collision:
@@ -67,7 +67,7 @@ Features / Supports
 - refactoring actions (lombok and delombok)
 - project configuration inspection (missing/out-of-date Lombok dependency, annotation processing disabled)
 
-This Lombok plugin evolution also supports additional annotations such as
+*This Lombok plugin evolution also supports additional annotations such as*
 - @ById with verification against @ByIdRefField presence
 
 Many features of the plugin (including warnings) could be disabled through per-project settings.
@@ -178,6 +178,9 @@ Developed By
 - [**@ocadaruma** Haruki Okada](https://github.com/ocadaruma)
 - [**@mackatozis** Alexandros Efthymiadis](https://github.com/mackatozis)
 - [**@NekoCaffeine** NekoCaffeine](https://github.com/NekoCaffeine)
+
+**Evolution**
+- [**@CoolSoftRF** Cool Soft RF](https://github.com/NekoCaffeine)
 
 Supporters
 --------

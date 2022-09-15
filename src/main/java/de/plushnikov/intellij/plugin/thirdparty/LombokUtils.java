@@ -4,12 +4,14 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiType;
 import com.intellij.util.containers.ContainerUtil;
-import de.plushnikov.intellij.plugin.processor.field.AccessorsInfo;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
+
+import de.plushnikov.intellij.plugin.processor.field.AccessorsInfo;
 
 /**
  * @author ProjectLombok Team
@@ -17,6 +19,8 @@ import java.util.List;
  */
 public final class LombokUtils {
   public static final String LOMBOK_INTERN_FIELD_MARKER = "$";
+  public static final String LOMBOK_PACKAGE = "lombok.experimental";
+  public static final String BALI_PACKAGE = "ru.coolsoft.annotations";
 
   public static final List<String> NONNULL_ANNOTATIONS = ContainerUtil.immutableList(
     "androidx.annotation.NonNull",

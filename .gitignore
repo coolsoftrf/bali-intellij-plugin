@@ -9,3 +9,4 @@ distro/
 *.iml
 *.ipr
 *.iws
+/local.properties

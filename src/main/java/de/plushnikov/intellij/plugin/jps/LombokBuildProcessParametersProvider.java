@@ -1,6 +1,8 @@
 // Copyright 2000-2020 JetBrains s.r.o. Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE file.
 package de.plushnikov.intellij.plugin.jps;
 
+import static de.plushnikov.intellij.plugin.thirdparty.LombokUtils.LOMBOK_PACKAGE;
+
 import com.intellij.compiler.server.BuildProcessParametersProvider;
 import com.intellij.openapi.application.ReadAction;
 import com.intellij.openapi.diagnostic.Logger;
@@ -13,11 +15,13 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
-import de.plushnikov.intellij.plugin.Version;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
+
+import de.plushnikov.intellij.plugin.Version;
 
 public final class LombokBuildProcessParametersProvider extends BuildProcessParametersProvider {
   private static final Logger LOG = Logger.getInstance(LombokBuildProcessParametersProvider.class);
@@ -30,18 +34,18 @@ public final class LombokBuildProcessParametersProvider extends BuildProcessPara
 
   @Override
   public @NotNull List<String> getVMArguments() {
-    if (isVersionLessThan1_18_16(myProject)) {
+    if (isIncrementalAnnotationProcessingProhibited(myProject)) {
       return Collections.singletonList("-Djps.track.ap.dependencies=false");
     }
     return super.getVMArguments();
   }
 
-  private boolean isVersionLessThan1_18_16(Project project) {
+  private boolean isIncrementalAnnotationProcessingProhibited(Project project) {
     return CachedValuesManager.getManager(project).getCachedValue(project, () -> {
       Boolean isVersionLessThan;
       try {
         isVersionLessThan = ReadAction.nonBlocking(
-          () -> isVersionLessThanInternal(project, Version.LAST_LOMBOK_VERSION_WITH_JPS_FIX))
+          () -> isVersionLessThanInternalIfPresent(project))
           .executeSynchronously();
       } catch (ProcessCanceledException e) {
         throw e;
@@ -53,15 +57,15 @@ public final class LombokBuildProcessParametersProvider extends BuildProcessPara
     });
   }
 
-  private boolean isVersionLessThanInternal(@NotNull Project project, @NotNull String version) {
-    PsiPackage aPackage = JavaPsiFacade.getInstance(project).findPackage("lombok.experimental");
+  private boolean isVersionLessThanInternalIfPresent(@NotNull Project project) {
+    PsiPackage aPackage = JavaPsiFacade.getInstance(project).findPackage(LOMBOK_PACKAGE);
     if (aPackage != null) {
       PsiDirectory[] directories = aPackage.getDirectories();
       if (directories.length > 0) {
         List<OrderEntry> entries =
           ProjectRootManager.getInstance(project).getFileIndex().getOrderEntriesForFile(directories[0].getVirtualFile());
         if (!entries.isEmpty()) {
-          return Version.isLessThan(entries.get(0), version);
+          return Version.isLessThan(entries.get(0), Version.LAST_LOMBOK_VERSION_WITH_JPS_FIX);
         }
       }
     }

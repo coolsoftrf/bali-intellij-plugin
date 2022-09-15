@@ -1,5 +1,8 @@
 package de.plushnikov.intellij.plugin.util;
 
+import static de.plushnikov.intellij.plugin.thirdparty.LombokUtils.BALI_PACKAGE;
+import static de.plushnikov.intellij.plugin.thirdparty.LombokUtils.LOMBOK_PACKAGE;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -7,17 +10,16 @@ import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiPackage;
 import com.intellij.psi.util.CachedValueProvider;
 import com.intellij.psi.util.CachedValuesManager;
+
 import org.jetbrains.annotations.NotNull;
 
 public class LombokLibraryUtil {
-
-  private static final String LOMBOK_PACKAGE = "lombok.experimental";
-
   public static boolean hasLombokLibrary(@NotNull Project project) {
     ApplicationManager.getApplication().assertReadAccessAllowed();
     return CachedValuesManager.getManager(project).getCachedValue(project, () -> {
       PsiPackage aPackage = JavaPsiFacade.getInstance(project).findPackage(LOMBOK_PACKAGE);
-      return new CachedValueProvider.Result<>(aPackage, ProjectRootManager.getInstance(project));
-    }) != null;
+      PsiPackage bPackage = JavaPsiFacade.getInstance(project).findPackage(BALI_PACKAGE);
+      return new CachedValueProvider.Result<>(aPackage != null || bPackage != null, ProjectRootManager.getInstance(project));
+    });
   }
 }
