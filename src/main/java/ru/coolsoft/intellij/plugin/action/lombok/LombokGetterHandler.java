@@ -1,0 +1,33 @@
+package ru.coolsoft.intellij.plugin.action.lombok;
+
+import com.intellij.psi.PsiClass;
+import com.intellij.psi.PsiField;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiModifier;
+import com.intellij.psi.util.PropertyUtilBase;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import ru.coolsoft.intellij.plugin.LombokClassNames;
+
+public class LombokGetterHandler extends BaseLombokHandler {
+
+  @Override
+  protected void processClass(@NotNull PsiClass psiClass) {
+    final Map<PsiField, PsiMethod> fieldMethodMap = new HashMap<>();
+    for (PsiField psiField : psiClass.getFields()) {
+      PsiMethod propertyGetter =
+        PropertyUtilBase.findPropertyGetter(psiClass, psiField.getName(), psiField.hasModifierProperty(PsiModifier.STATIC), false);
+
+      if (null != propertyGetter) {
+        fieldMethodMap.put(psiField, propertyGetter);
+      }
+    }
+
+    processIntern(fieldMethodMap, psiClass, LombokClassNames.GETTER);
+  }
+
+}

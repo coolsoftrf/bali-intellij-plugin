@@ -1,5 +1,3 @@
-package de.plushnikov.intellij.plugin.configsystem;
-
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor

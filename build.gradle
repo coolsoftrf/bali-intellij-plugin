@@ -38,6 +38,16 @@ tasks.withType(JavaCompile) {
   options.encoding = 'UTF-8'
 //  options.compilerArgs << "-Xlint:unchecked" << "-Xlint:deprecation"
 }
+tasks.withType(Copy) {
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+/*
+tasks {
+  buildSearchableOptions {
+    jvmArgs << "--add-exports" << "java.base/jdk.internal.vm=ALL-UNNAMED"
+  }
+}
+*/
 
 sourceSets {
   main {
@@ -114,18 +124,18 @@ task generateLombok {
 generateParser {
   println "Generating Parser for GrammerKit: ${grammarKit.grammarKitRelease}"
 
-  source = "src/main/resources/de/plushnikov/intellij/plugin/language/lombokConfig.bnf"
+  source = "src/main/resources/ru/coolsoft/intellij/plugin/language/lombokConfig.bnf"
   targetRoot = "generated/src"
-  pathToParser = "/de/plushnikov/intellij/plugin/language/parser/LombokConfigParser.java"
-  pathToPsiRoot = "/de/plushnikov/intellij/plugin/language/psi"
+  pathToParser = "/ru/coolsoft/intellij/plugin/language/parser/LombokConfigParser.java"
+  pathToPsiRoot = "/ru/coolsoft/intellij/plugin/language/psi"
 }
 
 generateLexer {
   dependsOn generateParser
   println "Generating Lexer for JFlexRelease: ${grammarKit.jflexRelease}"
 
-  source = "src/main/resources/de/plushnikov/intellij/plugin/language/lombokConfig.flex"
-  targetDir = "generated/src/de/plushnikov/intellij/plugin/language"
+  source = "src/main/resources/ru/coolsoft/intellij/plugin/language/lombokConfig.flex"
+  targetDir = "generated/src/ru/coolsoft/intellij/plugin/language"
   targetClass = "LombokConfigLexer"
 }
 

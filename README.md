@@ -13,7 +13,7 @@ bali-intellij-plugin [![Donate](https://www.paypal.com/en_US/i/btn/btn_donateCC_
 
 Provides support for lombok annotations to write great Java code with IntelliJ IDEA.
 
-**Last version (0.35.2) released on 08.08.2022**
+**Last version (0.36) released on 16.09.2022**
 
 ---
 :collision: **Breaking News: Starting with IntelliJ version 2020.3 lombok plugin will be integrated and included in IntelliJ by default!.** :collision:
